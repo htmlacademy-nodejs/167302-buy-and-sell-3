@@ -1,0 +1,25 @@
+{
+  "name": "167302-buy-and-sell-3",
+  "version": "0.1.0",
+  "description": "«Куплю. Продам»",
+  "main": "./src/service/service.js",
+  "scripts": {
+    "test": "npm run eslint",
+    "start": "node ./src/service/service.js",
+    "eslint": "eslint --ext .js src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fedoskina/167302-buy-and-sell-3.git"
+  },
+  "author": "Elena Fedosikhina",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Fedoskina/167302-buy-and-sell-3/issues"
+  },
+  "homepage": "https://github.com/Fedoskina/167302-buy-and-sell-3#readme",
+  "devDependencies": {
+    "eslint": "6.8.0",
+    "eslint-config-htmlacademy": "0.5.2"
+  }
+}
