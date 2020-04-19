@@ -12,6 +12,7 @@ const {title,
   fileName,
   SumRestrict,
   ExitCode} = require(`./utils/constants`);
+const {successTheme, errorTheme} = require(`./utils/theme`);
 const fs = require(`fs`);
 
 const getPictureFileName = () => {
@@ -32,22 +33,33 @@ const generateDescription = (count) => (
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+  async run(args) {
     const [count] = args;
     const countOffer = Number.parseInt(count, 10) || defaultAmount;
     const content = JSON.stringify(generateDescription(countOffer), null, 2);
+
+    const generateMock = () => {
+      return new Promise((resolve, reject) => {
+        fs.writeFile(fileName, content, (err) => {
+          if (err) {
+            return reject(`Can't write data to file...`);
+          }
+
+          return resolve(`Operation success. File created.`);
+        });
+      });
+    };
 
     if (count > maxMockData) {
       console.log(warning);
       process.exit(ExitCode.error);
     }
 
-    fs.writeFile(fileName, content, (err) => {
-      if (err) {
-        return console.error(`Can't write data to file...`);
-      }
-
-      return console.info(`Operation success. File created.`);
-    });
+    try {
+      const successMessage = await generateMock();
+      console.log(successTheme(successMessage));
+    } catch (e) {
+      console.log(errorTheme(e));
+    }
   }
 };
