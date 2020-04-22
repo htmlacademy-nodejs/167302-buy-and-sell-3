@@ -35,6 +35,12 @@ module.exports = {
   name: `--generate`,
   async run(args) {
     const [count] = args;
+
+    if (count > maxMockData) {
+      console.log(warning);
+      process.exit(ExitCode.error);
+    }
+
     const countOffer = Number.parseInt(count, 10) || defaultAmount;
     const content = JSON.stringify(generateDescription(countOffer), null, 2);
 
@@ -49,11 +55,6 @@ module.exports = {
         });
       });
     };
-
-    if (count > maxMockData) {
-      console.log(warning);
-      process.exit(ExitCode.error);
-    }
 
     try {
       const successMessage = await generateMock();
