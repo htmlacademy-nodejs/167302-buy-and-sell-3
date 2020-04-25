@@ -20,13 +20,17 @@ const getPictureFileName = () => {
   return `item${randomImage < 10 ? `0${randomImage}` : randomImage}.jpg`;
 };
 
+const getTypeIndex = () => {
+  return Math.floor(Math.random() * offerType.length);
+};
+
 const generateDescription = (count) => (
   Array(count).fill({}).map(() => ({
     category: [category[getRandomInt(0, category.length - 1)]],
     description: shuffle(description).slice(1, 5).join(` `),
     picture: getPictureFileName(),
     title: title[getRandomInt(0, title.length - 1)],
-    type: Object.keys(offerType)[Math.floor(Math.random() * Object.keys(offerType).length)],
+    type: offerType[getTypeIndex()],
     sum: getRandomInt(SumRestrict.min, SumRestrict.max),
   }))
 );
