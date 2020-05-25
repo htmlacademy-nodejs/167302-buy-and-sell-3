@@ -15,4 +15,4 @@ node_modules/
 build/
 
 # Данные для тестов
- mocks.json
+mocks.json

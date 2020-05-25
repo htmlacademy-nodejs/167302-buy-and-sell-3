@@ -1,5 +1,7 @@
 'use strict';
 
+const {helpTheme} = require(`./utils/theme`);
+
 module.exports = {
   name: `--help`,
   run() {
@@ -15,6 +17,6 @@ module.exports = {
       --generate <count>    формирует файл mocks.json
     `;
 
-    console.info(infoText);
+    console.info(helpTheme(infoText));
   }
 };
