@@ -1,19 +1,19 @@
-'use strict';
+"use strict";
 
 const {getRandomInt} = require(`./utils/getRandomInt`);
 const {shuffle} = require(`./utils/shuffle`);
-const {title,
-  description,
-  category,
+const path = require(`path`);
+const {
   maxMockData,
   warning,
   offerType,
   defaultAmount,
   fileName,
   SumRestrict,
-  ExitCode} = require(`./utils/constants`);
+  ExitCode,
+} = require(`./utils/constants`);
 const {successTheme, errorTheme} = require(`./utils/theme`);
-const fs = require(`fs`);
+const fs = require(`fs`).promises;
 
 const getPictureFileName = () => {
   const randomImage = getRandomInt(1, 16);
@@ -24,20 +24,37 @@ const getTypeIndex = () => {
   return Math.floor(Math.random() * offerType.length);
 };
 
-const generateMock = (content) => {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(fileName, content, (err) => {
-      if (err) {
-        return reject(`Can't write data to file...`);
-      }
-
-      return resolve(`Operation success. File created.`);
-    });
-  });
+const generateMock = async (content) => {
+  try {
+    await fs.writeFile(
+        path.resolve(__dirname, `../../../${fileName}`),
+        content
+    );
+    return `Operation success. File created.`;
+  } catch (e) {
+    throw new Error(`Can't write data to file...`);
+  }
 };
 
-const generateDescription = (count) => {
+const getTestData = async (outputFileName) => {
+  try {
+    const data = await fs.readFile(
+        path.resolve(__dirname, `../../../data/${outputFileName}`),
+        `utf8`
+    );
+    return data.split(`\r\n`);
+  } catch (e) {
+    return console.log(`Test data do not create`, e);
+  }
+};
+
+const generateDescription = async (count) => {
   let mockData = [];
+
+  const title = await getTestData(`titles.txt`);
+  const description = await getTestData(`sentences.txt`);
+  const category = await getTestData(`categories.txt`);
+
   const generateEntry = () => ({
     category: [category[getRandomInt(0, category.length - 1)]],
     description: shuffle(description).slice(1, 5).join(` `),
@@ -66,7 +83,7 @@ module.exports = {
     }
 
     const countOffer = Number.parseInt(count, 10) || defaultAmount;
-    const content = JSON.stringify(generateDescription(countOffer), null, 2);
+    const content = JSON.stringify(await generateDescription(countOffer), null, 2);
 
     try {
       const successMessage = await generateMock(content);
@@ -74,5 +91,5 @@ module.exports = {
     } catch (e) {
       console.log(errorTheme(e));
     }
-  }
+  },
 };
