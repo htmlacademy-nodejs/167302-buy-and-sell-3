@@ -24,10 +24,10 @@ const getTypeIndex = () => {
   return Math.floor(Math.random() * offerType.length);
 };
 
-const generateMock = async (content) => {
+const saveMockToFile = async (content, inputFileName) => {
   try {
     await fs.writeFile(
-        path.resolve(__dirname, `../../../${fileName}`),
+        path.resolve(__dirname, `../../../${inputFileName}`),
         content
     );
     return `Operation success. File created.`;
@@ -44,7 +44,7 @@ const getTestData = async (outputFileName) => {
     );
     return data.split(`\r\n`);
   } catch (e) {
-    return console.log(`Test data do not create`, e);
+    throw new Error(`Test data was not create`);
   }
 };
 
@@ -83,10 +83,9 @@ module.exports = {
     }
 
     const countOffer = Number.parseInt(count, 10) || defaultAmount;
-    const content = JSON.stringify(await generateDescription(countOffer), null, 2);
-
     try {
-      const successMessage = await generateMock(content);
+      const content = JSON.stringify(await generateDescription(countOffer), null, 2);
+      const successMessage = await saveMockToFile(content, fileName);
       console.log(successTheme(successMessage));
     } catch (e) {
       console.log(errorTheme(e));
