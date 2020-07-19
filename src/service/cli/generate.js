@@ -1,19 +1,18 @@
-'use strict';
+"use strict";
 
 const {getRandomInt} = require(`./utils/getRandomInt`);
 const {shuffle} = require(`./utils/shuffle`);
-const {title,
-  description,
-  category,
+const path = require(`path`);
+const {
   maxMockData,
   warning,
   offerType,
   defaultAmount,
-  fileName,
   SumRestrict,
-  ExitCode} = require(`./utils/constants`);
+  ExitCode,
+} = require(`./utils/constants`);
 const {successTheme, errorTheme} = require(`./utils/theme`);
-const fs = require(`fs`);
+const fs = require(`fs`).promises;
 
 const getPictureFileName = () => {
   const randomImage = getRandomInt(1, 16);
@@ -24,20 +23,37 @@ const getTypeIndex = () => {
   return Math.floor(Math.random() * offerType.length);
 };
 
-const generateMock = (content) => {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(fileName, content, (err) => {
-      if (err) {
-        return reject(`Can't write data to file...`);
-      }
-
-      return resolve(`Operation success. File created.`);
-    });
-  });
+const saveMockToFile = async (content, inputFileName = `mocks.json`) => {
+  try {
+    await fs.writeFile(
+        path.resolve(__dirname, `../../../${inputFileName}`),
+        content
+    );
+    return `Operation success. File created.`;
+  } catch (e) {
+    throw new Error(`Can't write data to file...`);
+  }
 };
 
-const generateDescription = (count) => {
+const getTestData = async (outputFileName) => {
+  try {
+    const data = await fs.readFile(
+        path.resolve(__dirname, `../../../data/${outputFileName}`),
+        `utf8`
+    );
+    return data.split(`\r\n`);
+  } catch (e) {
+    throw new Error(`Test data was not create`);
+  }
+};
+
+const generateDescription = async (count) => {
   let mockData = [];
+
+  const title = await getTestData(`titles.txt`);
+  const description = await getTestData(`sentences.txt`);
+  const category = await getTestData(`categories.txt`);
+
   const generateEntry = () => ({
     category: [category[getRandomInt(0, category.length - 1)]],
     description: shuffle(description).slice(1, 5).join(` `),
@@ -58,7 +74,7 @@ const generateDescription = (count) => {
 module.exports = {
   name: `--generate`,
   async run(args) {
-    const [count] = args;
+    const [count, fileName] = args;
 
     if (count > maxMockData) {
       console.log(warning);
@@ -66,13 +82,12 @@ module.exports = {
     }
 
     const countOffer = Number.parseInt(count, 10) || defaultAmount;
-    const content = JSON.stringify(generateDescription(countOffer), null, 2);
-
     try {
-      const successMessage = await generateMock(content);
+      const content = JSON.stringify(await generateDescription(countOffer), null, 2);
+      const successMessage = await saveMockToFile(content, fileName);
       console.log(successTheme(successMessage));
     } catch (e) {
       console.log(errorTheme(e));
     }
-  }
+  },
 };
