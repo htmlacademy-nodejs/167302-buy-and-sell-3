@@ -8,7 +8,6 @@ const {
   warning,
   offerType,
   defaultAmount,
-  fileName,
   SumRestrict,
   ExitCode,
 } = require(`./utils/constants`);
@@ -24,7 +23,7 @@ const getTypeIndex = () => {
   return Math.floor(Math.random() * offerType.length);
 };
 
-const saveMockToFile = async (content, inputFileName) => {
+const saveMockToFile = async (content, inputFileName = `mocks.json`) => {
   try {
     await fs.writeFile(
         path.resolve(__dirname, `../../../${inputFileName}`),
@@ -75,7 +74,7 @@ const generateDescription = async (count) => {
 module.exports = {
   name: `--generate`,
   async run(args) {
-    const [count] = args;
+    const [count, fileName] = args;
 
     if (count > maxMockData) {
       console.log(warning);
